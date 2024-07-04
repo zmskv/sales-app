@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user model.User) (string, error)
+	GetUser(username, password string) (model.User, error)
 }
 
 type SalesList interface {
