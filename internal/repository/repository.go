@@ -1,8 +1,12 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/zmskv/sales-app/internal/model"
+	"gorm.io/gorm"
+)
 
 type Authorization interface {
+	CreateUser(user model.User) (string, error)
 }
 
 type SalesList interface {
@@ -13,6 +17,8 @@ type Repository struct {
 	SalesList
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{}
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{
+		Authorization: NewAuthPostgres(db),
+	}
 }

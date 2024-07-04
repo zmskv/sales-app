@@ -1,2 +1,2 @@
-DROP TABLE "User";
-DROP TABLE "Sales_List";
+DROP TABLE "users";
+DROP TABLE "sales_list";

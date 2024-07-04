@@ -1,13 +1,8 @@
 package model
 
-import (
-	"time"
-)
-
 type User struct {
-	Id        string     `json:"id"`
-	Username  string     `json:"username"`
-	Password  string     `json:"password"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	Id        string `json:"-"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	IsCreated bool   `json:"-"`
 }
