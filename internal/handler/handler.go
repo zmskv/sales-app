@@ -26,7 +26,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		list := api.Group("/list")
 		{
-			list.POST("/", h.createRecord)
+			list.POST("/add", h.createRecord)
 			list.POST("/export_to_pdf", h.exportToPDF)
 			list.GET("/:id", h.getRecord)
 			list.PATCH("/:id/edit", h.editRecord)

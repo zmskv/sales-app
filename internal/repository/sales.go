@@ -22,3 +22,13 @@ func (r *SalesPostgres) CreateRecord(record model.Product) (int, error) {
 
 	return record.Id, nil
 }
+
+func (r *SalesPostgres) GetRecord(id string) (model.Product, error) {
+	var data model.Product
+	request := r.db.Table("sales_list").Where("id = ?", id).First(&data)
+	if request.Error != nil {
+		return model.Product{}, request.Error
+	}
+
+	return data, nil
+}

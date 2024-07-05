@@ -35,6 +35,20 @@ func (h *Handler) exportToPDF(c *gin.Context) {
 }
 
 func (h *Handler) getRecord(c *gin.Context) {
+	id := c.Param("id")
+	data, err := h.services.SalesList.GetRecord(id)
+	if err != nil {
+		NewValidationResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id":       data.Id,
+		"username": data.Username,
+		"title":    data.Title,
+		"amount":   data.Amount,
+		"price":    data.Price,
+		"date":     data.Date,
+	})
 
 }
 

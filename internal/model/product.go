@@ -9,6 +9,6 @@ type Product struct {
 	Username string    `json:"username"`
 	Title    string    `json:"title" binding:"required"`
 	Amount   int       `json:"amount" binding:"required"`
-	Price    int       `json:"price" binding:"required"`
+	Price    float64   `json:"price" binding:"required"`
 	Date     time.Time `json:"date"`
 }
