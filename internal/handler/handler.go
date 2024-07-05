@@ -24,10 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api", h.userIdentity)
 	{
+		api.GET("/all_sales", h.getAllRecords)
+		api.POST("/export_to_pdf", h.exportToPDF)
 		list := api.Group("/list")
 		{
 			list.POST("/add", h.createRecord)
-			list.POST("/export_to_pdf", h.exportToPDF)
 			list.GET("/:id", h.getRecord)
 			list.DELETE("/delete", h.deleteRecord)
 

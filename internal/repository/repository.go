@@ -14,6 +14,7 @@ type SalesList interface {
 	CreateRecord(record model.Product) (int, error)
 	GetRecord(id string) (model.Product, error)
 	DeleteRecord(id string) (string, error)
+	GetAllRecords() ([]model.Product, error)
 }
 
 type Repository struct {

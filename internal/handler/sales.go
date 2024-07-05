@@ -86,3 +86,26 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 		"status": msg,
 	})
 }
+
+type ProductWithIndex struct {
+	Index   int           `json:"index"`
+	Product model.Product `json:"product"`
+}
+
+func (h *Handler) getAllRecords(c *gin.Context) {
+	data, err := h.services.SalesList.GetAllRecords()
+	if err != nil {
+		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	var productsWithIndex []ProductWithIndex
+	for i, product := range data {
+		productsWithIndex = append(productsWithIndex, ProductWithIndex{
+			Index:   i + 1,
+			Product: product,
+		})
+	}
+
+	c.JSON(http.StatusOK, productsWithIndex)
+
+}

@@ -41,3 +41,13 @@ func (r *SalesPostgres) DeleteRecord(id string) (string, error) {
 
 	return "Successful deleted", nil
 }
+
+func (r *SalesPostgres) GetAllRecords() ([]model.Product, error) {
+	var products []model.Product
+	request := r.db.Table("sales_list").Find(&products)
+	if request.Error != nil {
+		return nil, request.Error
+	}
+
+	return products, nil
+}

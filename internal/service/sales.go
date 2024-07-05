@@ -24,3 +24,7 @@ func (s *SalesService) GetRecord(id string) (model.Product, error) {
 func (s *SalesService) DeleteRecord(id string) (string, error) {
 	return s.repos.DeleteRecord(id)
 }
+
+func (s *SalesService) GetAllRecords() ([]model.Product, error) {
+	return s.repos.GetAllRecords()
+}
