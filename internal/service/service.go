@@ -14,6 +14,7 @@ type Authorization interface {
 type SalesList interface {
 	CreateRecord(record model.Product) (int, error)
 	GetRecord(id string) (model.Product, error)
+	DeleteRecord(id string) (string, error)
 }
 
 type Service struct {

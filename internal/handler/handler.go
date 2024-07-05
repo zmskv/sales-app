@@ -29,8 +29,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			list.POST("/add", h.createRecord)
 			list.POST("/export_to_pdf", h.exportToPDF)
 			list.GET("/:id", h.getRecord)
-			list.PATCH("/:id/edit", h.editRecord)
-			list.DELETE("/:id", h.deleteRecord)
+			list.DELETE("/delete", h.deleteRecord)
 
 		}
 	}

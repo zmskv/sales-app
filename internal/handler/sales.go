@@ -52,10 +52,37 @@ func (h *Handler) getRecord(c *gin.Context) {
 
 }
 
-func (h *Handler) editRecord(c *gin.Context) {
-
+type DeleteRequest struct {
+	ID string `json:"id" binding:"required"`
 }
 
 func (h *Handler) deleteRecord(c *gin.Context) {
+	var req DeleteRequest
+	if err := c.BindJSON(&req); err != nil {
+		NewValidationResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	id := req.ID
+	username, _ := c.Get("username")
+	data, err := h.services.SalesList.GetRecord(id)
+	if err != nil {
+		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if data.Username != username {
+		NewValidationResponse(c, http.StatusForbidden, "User does not have permission to delete this record")
+		return
+	}
+
+	msg, err := h.services.SalesList.DeleteRecord(id)
+	if err != nil {
+		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"status": msg,
+	})
 }

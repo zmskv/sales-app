@@ -32,3 +32,12 @@ func (r *SalesPostgres) GetRecord(id string) (model.Product, error) {
 
 	return data, nil
 }
+
+func (r *SalesPostgres) DeleteRecord(id string) (string, error) {
+	request := r.db.Table("sales_list").Where("id = ?", id).Delete(&model.Product{})
+	if request.Error != nil {
+		return "", request.Error
+	}
+
+	return "Successful deleted", nil
+}
