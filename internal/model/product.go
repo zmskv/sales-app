@@ -5,10 +5,10 @@ import (
 )
 
 type Product struct {
-	Id     int       `json:"id"`
-	Title  string    `json:"title"`
-	Amount int       `json:"amount"`
-	Price  int       `json:"price"`
-	Total  int       `json:"total"`
-	Date   time.Time `json:"date"`
+	Id       int       `json:"id" binding:"required"`
+	Username string    `json:"username"`
+	Title    string    `json:"title" binding:"required"`
+	Amount   int       `json:"amount" binding:"required"`
+	Price    int       `json:"price" binding:"required"`
+	Date     time.Time `json:"date"`
 }

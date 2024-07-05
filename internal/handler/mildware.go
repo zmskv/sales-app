@@ -16,11 +16,13 @@ func (h *Handler) userIdentity(c *gin.Context) {
 
 	headerParts := strings.Split(header, " ")
 
-	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+	userId, Username, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
 		NewValidationResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	c.Set("userId", userId)
+	c.Set("user_id", userId)
+	c.Set("username", Username)
+
 }

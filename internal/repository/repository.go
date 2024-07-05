@@ -11,6 +11,7 @@ type Authorization interface {
 }
 
 type SalesList interface {
+	CreateRecord(record model.Product) (int, error)
 }
 
 type Repository struct {
@@ -21,5 +22,6 @@ type Repository struct {
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		SalesList:     NewSalesPostgres(db),
 	}
 }

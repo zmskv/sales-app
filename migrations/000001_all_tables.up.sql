@@ -3,7 +3,7 @@ CREATE TABLE "users" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    is_created BOOLEAN DEFAULT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -12,6 +12,6 @@ CREATE TABLE "sales_list" (
     title TEXT NOT NULL,
     amount INTEGER NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    total DECIMAL(10, 2) NOT NULL,
+    username TEXT NOT NULL,
     date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
