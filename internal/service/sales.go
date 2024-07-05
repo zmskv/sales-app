@@ -1,12 +1,20 @@
 package service
 
 import (
+	"fmt"
+
+	"github.com/jung-kurt/gofpdf"
 	"github.com/zmskv/sales-app/internal/model"
 	"github.com/zmskv/sales-app/internal/repository"
 )
 
 type SalesService struct {
 	repos repository.SalesList
+}
+
+type ProductWithIndex struct {
+	Index   int           `json:"index"`
+	Product model.Product `json:"product"`
 }
 
 func NewSalesService(repos repository.SalesList) *SalesService {
@@ -27,4 +35,71 @@ func (s *SalesService) DeleteRecord(id string) (string, error) {
 
 func (s *SalesService) GetAllRecords() ([]model.Product, error) {
 	return s.repos.GetAllRecords()
+}
+
+func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, error) {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	// Устанавливаем шрифт и размер для заголовка
+	pdf.SetFont("Arial", "B", 20)
+	pdf.Cell(40, 10, "Sales Report")
+	pdf.Ln(20)
+
+	// Устанавливаем шрифт и размер для заголовков таблицы
+	pdf.SetFont("Arial", "B", 12)
+	headers := []string{"ID", "Title", "Amount", "Price", "Revenue", "Username", "Date"}
+	for _, header := range headers {
+		pdf.CellFormat(25, 10, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(10)
+
+	// Устанавливаем шрифт и размер для содержимого таблицы
+	pdf.SetFont("Arial", "", 10)
+
+	for _, record := range sales {
+		pdf.CellFormat(25, 10, fmt.Sprintf("%d", record.Product.Id), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, record.Product.Title, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, fmt.Sprintf("%d", record.Product.Amount), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, fmt.Sprintf("%.2f", record.Product.Price), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, fmt.Sprintf("%.2f", float64(record.Product.Amount)*record.Product.Price), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, record.Product.Username, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(25, 10, record.Product.Date.Format("2006-01-02"), "1", 0, "C", false, 0, "")
+		pdf.Ln(10)
+	}
+	pdf.Ln(20)
+
+	// Устанавливаем шрифт и размер для заголовков таблицы
+	pdf.SetFont("Arial", "B", 12)
+	headers = []string{"Month", "Total Revenue"}
+	for _, header := range headers {
+		pdf.CellFormat(87.5, 10, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(10)
+
+	pdf.SetFont("Arial", "", 10)
+
+	var totalRevenue float64
+	revenueByMonth := make(map[string]float64)
+	for _, record := range sales {
+		month := record.Product.Date.Format("2006-01")
+		if _, exists := revenueByMonth[month]; !exists {
+			revenueByMonth[month] = 0.0
+		}
+		revenueByMonth[month] += float64(record.Product.Amount) * record.Product.Price
+		totalRevenue += float64(record.Product.Amount) * record.Product.Price
+	}
+
+	for month, revenue := range revenueByMonth {
+		pdf.CellFormat(87.5, 10, month, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(87.5, 10, fmt.Sprintf("%.2f", revenue), "1", 0, "C", false, 0, "")
+		pdf.Ln(10)
+	}
+	pdf.Ln(20)
+
+	pdf.SetFont("Arial", "B", 14)
+
+	pdf.Cell(40, 20, fmt.Sprintf("Total Revenue for all time: %.2f", totalRevenue))
+
+	return pdf, pdf.Error()
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/jung-kurt/gofpdf"
 	"github.com/zmskv/sales-app/internal/model"
 	"github.com/zmskv/sales-app/internal/repository"
 )
@@ -16,6 +17,7 @@ type SalesList interface {
 	GetRecord(id string) (model.Product, error)
 	DeleteRecord(id string) (string, error)
 	GetAllRecords() ([]model.Product, error)
+	ExportToPDF(productsWithIndex []ProductWithIndex) (*gofpdf.Fpdf, error)
 }
 
 type Service struct {

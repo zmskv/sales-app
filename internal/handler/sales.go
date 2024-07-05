@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zmskv/sales-app/internal/model"
+	"github.com/zmskv/sales-app/internal/service"
 )
 
 func (h *Handler) createRecord(c *gin.Context) {
@@ -28,10 +29,6 @@ func (h *Handler) createRecord(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"created record": msg,
 	})
-}
-
-func (h *Handler) exportToPDF(c *gin.Context) {
-
 }
 
 func (h *Handler) getRecord(c *gin.Context) {
@@ -87,20 +84,15 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 	})
 }
 
-type ProductWithIndex struct {
-	Index   int           `json:"index"`
-	Product model.Product `json:"product"`
-}
-
 func (h *Handler) getAllRecords(c *gin.Context) {
 	data, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
 		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	var productsWithIndex []ProductWithIndex
+	var productsWithIndex []service.ProductWithIndex
 	for i, product := range data {
-		productsWithIndex = append(productsWithIndex, ProductWithIndex{
+		productsWithIndex = append(productsWithIndex, service.ProductWithIndex{
 			Index:   i + 1,
 			Product: product,
 		})
@@ -108,4 +100,27 @@ func (h *Handler) getAllRecords(c *gin.Context) {
 
 	c.JSON(http.StatusOK, productsWithIndex)
 
+}
+
+func (h *Handler) exportToPDF(c *gin.Context) {
+	sales, err := h.services.SalesList.GetAllRecords()
+	if err != nil {
+		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	var data []service.ProductWithIndex
+	for i, product := range sales {
+		data = append(data, service.ProductWithIndex{
+			Index:   i + 1,
+			Product: product,
+		})
+	}
+	docs, err := h.services.SalesList.ExportToPDF(data)
+	if err != nil {
+		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Header("Content-Disposition", "attachment; filename=sales_report.pdf")
+	c.Header("Content-Type", "application/pdf")
+	docs.Output(c.Writer)
 }
