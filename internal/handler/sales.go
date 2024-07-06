@@ -49,22 +49,17 @@ func (h *Handler) getRecord(c *gin.Context) {
 
 }
 
-type DeleteRequest struct {
-	ID string `json:"id" binding:"required"`
-}
-
 func (h *Handler) deleteRecord(c *gin.Context) {
-	var req DeleteRequest
-	if err := c.BindJSON(&req); err != nil {
+	var id string
+	if err := c.BindJSON(&id); err != nil {
 		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id := req.ID
 	username, _ := c.Get("username")
 	data, err := h.services.SalesList.GetRecord(id)
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
 
