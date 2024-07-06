@@ -6,7 +6,7 @@ import (
 	"github.com/zmskv/sales-app/internal/repository"
 )
 
-type Authorization interface {
+type User interface {
 	CreateUser(user model.User) (string, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (string, string, error)
@@ -21,13 +21,13 @@ type SalesList interface {
 }
 
 type Service struct {
-	Authorization
+	User
 	SalesList
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
-		SalesList:     NewSalesService(repos.SalesList),
+		User:      NewAuthService(repos.User),
+		SalesList: NewSalesService(repos.SalesList),
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Authorization interface {
+type User interface {
 	CreateUser(user model.User) (string, error)
 	GetUser(username, password string) (model.User, error)
 }
@@ -18,13 +18,13 @@ type SalesList interface {
 }
 
 type Repository struct {
-	Authorization
+	User
 	SalesList
 }
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		Authorization: NewAuthPostgres(db),
-		SalesList:     NewSalesPostgres(db),
+		User:      NewUserPostgres(db),
+		SalesList: NewSalesPostgres(db),
 	}
 }

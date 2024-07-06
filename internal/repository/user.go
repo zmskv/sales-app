@@ -5,15 +5,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthPostgres struct {
+type UserPostgres struct {
 	db *gorm.DB
 }
 
-func NewAuthPostgres(db *gorm.DB) *AuthPostgres {
-	return &AuthPostgres{db: db}
+func NewUserPostgres(db *gorm.DB) *UserPostgres {
+	return &UserPostgres{db: db}
 }
 
-func (r *AuthPostgres) CreateUser(user model.User) (string, error) {
+func (r *UserPostgres) CreateUser(user model.User) (string, error) {
 
 	result := r.db.Create(&user)
 	if result.Error != nil {
@@ -23,7 +23,7 @@ func (r *AuthPostgres) CreateUser(user model.User) (string, error) {
 	return user.Id, nil
 }
 
-func (r *AuthPostgres) GetUser(username, password string) (model.User, error) {
+func (r *UserPostgres) GetUser(username, password string) (model.User, error) {
 	var user model.User
 	result := r.db.Table("users").Select("id").Where("username = ? AND password = ?", username, password).First(&user)
 	if result.Error != nil {

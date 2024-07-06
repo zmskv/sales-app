@@ -10,15 +10,15 @@ import (
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader("Authorization")
 	if header == "" {
-		NewValidationResponse(c, http.StatusUnauthorized, "Auth Header is empty")
+		NewErrorResponse(c, http.StatusUnauthorized, "Auth Header is empty")
 		return
 	}
 
 	headerParts := strings.Split(header, " ")
 
-	userId, Username, err := h.services.Authorization.ParseToken(headerParts[1])
+	userId, Username, err := h.services.User.ParseToken(headerParts[1])
 	if err != nil {
-		NewValidationResponse(c, http.StatusUnauthorized, err.Error())
+		NewErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 

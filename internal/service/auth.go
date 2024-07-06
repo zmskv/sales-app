@@ -22,21 +22,21 @@ type tokenClaims struct {
 	UserId   string `json:"user_id"`
 	Username string `json:"username"`
 }
-type AuthService struct {
-	repos repository.Authorization
+type UserService struct {
+	repos repository.User
 }
 
-func NewAuthService(repos repository.Authorization) *AuthService {
-	return &AuthService{repos: repos}
+func NewAuthService(repos repository.User) *UserService {
+	return &UserService{repos: repos}
 }
 
-func (s *AuthService) CreateUser(user model.User) (string, error) {
+func (s *UserService) CreateUser(user model.User) (string, error) {
 	user.Password = generatePasswordHash(user.Password)
 	user.Id = uuid.New().String()
 	return s.repos.CreateUser(user)
 }
 
-func (s *AuthService) GenerateToken(username, password string) (string, error) {
+func (s *UserService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repos.GetUser(username, generatePasswordHash(password))
 	if err != nil {
 		return "", err
@@ -54,7 +54,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) ParseToken(accesstoken string) (string, string, error) {
+func (s *UserService) ParseToken(accesstoken string) (string, string, error) {
 	token, err := jwt.ParseWithClaims(accesstoken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

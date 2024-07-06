@@ -11,13 +11,13 @@ func (h *Handler) Login(c *gin.Context) {
 	var input model.User
 
 	if err := c.BindJSON(&input); err != nil {
-		NewValidationResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	msg, err := h.services.Authorization.CreateUser(input)
+	msg, err := h.services.User.CreateUser(input)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -36,13 +36,13 @@ func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
 	if err := c.BindJSON(&input); err != nil {
-		NewValidationResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
+	token, err := h.services.User.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

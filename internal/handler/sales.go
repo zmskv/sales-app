@@ -16,13 +16,13 @@ func (h *Handler) createRecord(c *gin.Context) {
 	input.Date = time.Now()
 
 	if err := c.BindJSON(&input); err != nil {
-		NewValidationResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	msg, err := h.services.SalesList.CreateRecord(input)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -35,7 +35,7 @@ func (h *Handler) getRecord(c *gin.Context) {
 	id := c.Param("id")
 	data, err := h.services.SalesList.GetRecord(id)
 	if err != nil {
-		NewValidationResponse(c, http.StatusNotFound, err.Error())
+		NewErrorResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
@@ -56,7 +56,7 @@ type DeleteRequest struct {
 func (h *Handler) deleteRecord(c *gin.Context) {
 	var req DeleteRequest
 	if err := c.BindJSON(&req); err != nil {
-		NewValidationResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -64,18 +64,18 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 	username, _ := c.Get("username")
 	data, err := h.services.SalesList.GetRecord(id)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if data.Username != username {
-		NewValidationResponse(c, http.StatusForbidden, "User does not have permission to delete this record")
+		NewErrorResponse(c, http.StatusForbidden, "User does not have permission to delete this record")
 		return
 	}
 
 	msg, err := h.services.SalesList.DeleteRecord(id)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -87,13 +87,13 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 func (h *Handler) getAllRecords(c *gin.Context) {
 	data, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	var productsWithIndex []service.ProductWithIndex
-	for i, product := range data {
+	for _, product := range data {
 		productsWithIndex = append(productsWithIndex, service.ProductWithIndex{
-			Index:   i + 1,
+			Index:   product.Id,
 			Product: product,
 		})
 	}
@@ -105,7 +105,7 @@ func (h *Handler) getAllRecords(c *gin.Context) {
 func (h *Handler) exportToPDF(c *gin.Context) {
 	sales, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	var data []service.ProductWithIndex
@@ -117,7 +117,7 @@ func (h *Handler) exportToPDF(c *gin.Context) {
 	}
 	docs, err := h.services.SalesList.ExportToPDF(data)
 	if err != nil {
-		NewValidationResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.Header("Content-Disposition", "attachment; filename=sales_report.pdf")
