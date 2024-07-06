@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/zmskv/sales-app/internal/config"
+	"github.com/zmskv/sales-app/internal/handler"
 )
 
 type Server struct {
@@ -32,9 +33,10 @@ func (s *Server) Shutdown(c context.Context) error {
 }
 
 func main() {
-	handlers := config.InitConfig()
+	db := config.InitConfig()
+	app := handler.InitApp(db)
 	server := new(Server)
-	if err := server.Run(os.Getenv("SERVER_PORT"), handlers.InitRoutes()); err != nil {
+	if err := server.Run(os.Getenv("SERVER_PORT"), app.InitRoutes()); err != nil {
 		log.Fatalf("Error %s", err.Error())
 	}
 

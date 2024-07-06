@@ -5,12 +5,11 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/zmskv/sales-app/internal/handler"
 	"github.com/zmskv/sales-app/internal/repository"
-	"github.com/zmskv/sales-app/internal/service"
+	"gorm.io/gorm"
 )
 
-func InitConfig() *handler.Handler {
+func InitConfig() *gorm.DB {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env %s", err.Error())
 	}
@@ -28,10 +27,6 @@ func InitConfig() *handler.Handler {
 	if err != nil {
 		log.Fatalf("Error initialization db: %s", err.Error())
 	}
-
-	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
-	return handlers
+	return db
 
 }
