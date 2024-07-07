@@ -10,6 +10,20 @@ import (
 	"github.com/zmskv/sales-app/internal/service"
 )
 
+// createRecord godoc
+//
+//	@Summary		Create Record
+//	@Security		ApiKeyAuth
+//	@Tags			api
+//	@Description	Create Record
+//	@ID				create-record
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		model.Product	true	"account info"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/api/list/add [post]
 func (h *Handler) createRecord(c *gin.Context) {
 	var input model.Product
 	username, _ := c.Get("username")

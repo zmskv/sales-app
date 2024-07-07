@@ -10,21 +10,22 @@ import (
 type signUpInput struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 }
 
 // signUp godoc
-// @Summary		Sign Up
-// @Security		ApiKeyAuth
-// @Tags			auth
-// @Description	Sign Up
-// @ID				sign-up
-// @Accept			json
-// @Produce			json
-// @Param		input	body signUpInput true "account info"
-// @Success		200		{object}	SuccessResponse
-// @Failure		400			{object}	ErrorResponse
-// @Failure		500		{object}	ErrorResponse
-// @Router			/auth/sign-up [post]
+//
+//	@Summary		Sign Up
+//	@Security		ApiKeyAuth
+//	@Tags			auth
+//	@Description	Сreates a new user in the system.
+//	@ID				sign-up
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		signUpInput	true	"Account info"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Router			/auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input signUpInput
 
@@ -35,10 +36,11 @@ func (h *Handler) signUp(c *gin.Context) {
 	var user model.User
 	user.Username = input.Username
 	user.Password = input.Password
+	user.Email = input.Email
 	msg, err := h.services.User.CreateUser(user)
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, "Username already used")
 		return
 	}
 
@@ -52,18 +54,19 @@ type signInInput struct {
 }
 
 // signIn godoc
-// @Summary		Sign In
-// @Security		ApiKeyAuth
-// @Tags			auth
-// @Description	Sign In
-// @ID				sign-in
-// @Accept			json
-// @Produce		json
-// @Param		input	body signInInput true "account info"
-// @Success		200		{object}	SuccessResponse
-// @Failure		400		{object}	ErrorResponse
-// @Failure		500		{object}	ErrorResponse
-// @Router			/auth/sign-in [post]
+//
+//	@Summary		Sign In
+//	@Security		ApiKeyAuth
+//	@Tags			auth
+//	@Description	Sign In
+//	@ID				sign-in
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		signInInput	true	"account info"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 

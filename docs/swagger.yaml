@@ -22,13 +22,36 @@ definitions:
     type: object
   handler.signUpInput:
     properties:
+      email:
+        type: string
       password:
         type: string
       username:
         type: string
     required:
+    - email
     - password
     - username
+    type: object
+  model.Product:
+    properties:
+      amount:
+        type: integer
+      date:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      title:
+        type: string
+      username:
+        type: string
+    required:
+    - amount
+    - id
+    - price
+    - title
     type: object
 host: localhost:8000
 info:
@@ -37,6 +60,39 @@ info:
   title: Sales API
   version: "1.0"
 paths:
+  /api/list/add:
+    post:
+      consumes:
+      - application/json
+      description: Create Record
+      operationId: create-record
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Record
+      tags:
+      - api
   /auth/sign-in:
     post:
       consumes:
@@ -74,10 +130,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Sign Up
+      description: Сreates a new user in the system.
       operationId: sign-up
       parameters:
-      - description: account info
+      - description: Account info
         in: body
         name: input
         required: true
@@ -92,10 +148,6 @@ paths:
             $ref: '#/definitions/handler.SuccessResponse'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
       security:

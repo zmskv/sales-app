@@ -9,7 +9,7 @@ import (
 type User interface {
 	CreateUser(user model.User) (string, error)
 	GenerateToken(username, password string) (string, error)
-	ParseToken(token string) (string, string, error)
+	ParseToken(token string) (string, string, string, error)
 }
 
 type SalesList interface {
