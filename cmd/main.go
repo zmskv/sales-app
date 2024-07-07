@@ -32,6 +32,17 @@ func (s *Server) Shutdown(c context.Context) error {
 	return s.httpServer.Shutdown(c)
 }
 
+//	@title			Sales API
+//	@version		1.0
+//	@description	API Server SalesList Application
+
+//@host localhost:8000
+//@BasePath /
+
+//@securityDefinitions.apikey ApiKeyAuth
+//@in Header
+//@name Authorization
+
 func main() {
 	db := config.InitConfig()
 	app := handler.InitApp(db)
