@@ -2,7 +2,11 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/zmskv/sales-app/internal/service"
+
+	_ "github.com/zmskv/sales-app/docs"
 )
 
 type Handler struct {
@@ -18,8 +22,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	auth := router.Group("/auth")
 	{
+		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
-		auth.POST("/login", h.Login)
 	}
 
 	api := router.Group("/api", h.userIdentity)
@@ -34,6 +38,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		}
 	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
