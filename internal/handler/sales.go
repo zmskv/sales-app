@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -26,9 +27,7 @@ func (h *Handler) createRecord(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"created record": msg,
-	})
+	NewSuccessResponse(c, http.StatusOK, fmt.Sprint(msg))
 }
 
 func (h *Handler) getRecord(c *gin.Context) {
@@ -74,9 +73,7 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"status": msg,
-	})
+	NewSuccessResponse(c, http.StatusOK, msg)
 }
 
 func (h *Handler) getAllRecords(c *gin.Context) {
