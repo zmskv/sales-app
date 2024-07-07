@@ -10,6 +10,13 @@ import (
 	"github.com/zmskv/sales-app/internal/service"
 )
 
+type recordInput struct {
+	Id     int     `json:"id" binding:"required"`
+	Title  string  `json:"title" binding:"required"`
+	Amount int     `json:"amount" binding:"required"`
+	Price  float64 `json:"price" binding:"required"`
+}
+
 // createRecord godoc
 //
 //	@Summary		Create Record
@@ -19,36 +26,68 @@ import (
 //	@ID				create-record
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		model.Product	true	"account info"
+//	@Param			query	body		recordInput	true	"Record info"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
+//	@Failure		401		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
 //	@Router			/api/list/add [post]
 func (h *Handler) createRecord(c *gin.Context) {
-	var input model.Product
+	var input recordInput
 	username, _ := c.Get("username")
-	input.Username = username.(string)
-	input.Date = time.Now()
 
-	if err := c.BindJSON(&input); err != nil {
+	record := model.Product{
+		Id:       input.Id,
+		Title:    input.Title,
+		Amount:   input.Amount,
+		Price:    input.Price,
+		Username: username.(string),
+		Date:     time.Now(),
+	}
+
+	if err := c.BindJSON(&record); err != nil {
 		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	msg, err := h.services.SalesList.CreateRecord(input)
+	msg, err := h.services.SalesList.CreateRecord(record)
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	NewSuccessResponse(c, http.StatusOK, fmt.Sprint(msg))
 }
 
+// getRecord godoc
+//
+//	@Summary		Get Record
+//	@Security		ApiKeyAuth
+//	@Tags			api
+//	@Description	Get Record
+//	@ID				get-record
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	false	"id"
+//
+//	@Success		200	{object}	model.Product
+//
+//	@Failure		400	{object}	ErrorResponse
+//
+//	@Failure		401	{object}	ErrorResponse
+//
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/api/list/{id} [get]
 func (h *Handler) getRecord(c *gin.Context) {
 	id := c.Param("id")
 	data, err := h.services.SalesList.GetRecord(id)
 	if err != nil {
-		NewErrorResponse(c, http.StatusNotFound, err.Error())
+		if err.Error() == "record not found" {
+			NewErrorResponse(c, http.StatusNotFound, err.Error())
+			return
+		}
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
@@ -62,17 +101,37 @@ func (h *Handler) getRecord(c *gin.Context) {
 
 }
 
+// deleteRecord godoc
+//
+//	@Summary		Delete Record
+//	@Security		ApiKeyAuth
+//	@Tags			api
+//	@Description	Delete Record
+//	@ID				delete-record
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	query		string	false	"id"
+//
+//	@Success		200	{object}	SuccessResponse
+//
+//	@Failure		400	{object}	ErrorResponse
+//
+//	@Failure		401	{object}	ErrorResponse
+//	@Failure		403	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/api/list/delete [delete]
 func (h *Handler) deleteRecord(c *gin.Context) {
-	var id string
-	if err := c.BindJSON(&id); err != nil {
-		NewErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
+	id := c.Query("id")
 
 	username, _ := c.Get("username")
 	data, err := h.services.SalesList.GetRecord(id)
 	if err != nil {
-		NewErrorResponse(c, http.StatusNotFound, err.Error())
+		if err.Error() == "record not found" {
+			NewErrorResponse(c, http.StatusNotFound, "ID is required")
+			return
+		}
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -83,17 +142,37 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 
 	msg, err := h.services.SalesList.DeleteRecord(id)
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	NewSuccessResponse(c, http.StatusOK, msg)
 }
 
+// getAllRecords godoc
+//
+// @Summary		Get All Records
+// @Security		ApiKeyAuth
+// @Tags			api
+// @Description	Get All Records
+// @ID				get-all-records
+// @Accept			json
+// @Produce		json
+//
+// @Success		200	{object}	service.ProductWithIndex
+//
+// @Failure		401	{object}	ErrorResponse
+// @Failure		404	{object}	ErrorResponse
+// @Failure		500	{object}	ErrorResponse
+// @Router			/api/all_sales [get]
 func (h *Handler) getAllRecords(c *gin.Context) {
 	data, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
 		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if len(data) == 0 {
+		NewErrorResponse(c, http.StatusNotFound, "Records not found")
 		return
 	}
 	var productsWithIndex []service.ProductWithIndex
@@ -108,6 +187,22 @@ func (h *Handler) getAllRecords(c *gin.Context) {
 
 }
 
+// exportToPDF godoc
+//
+// @Summary		Export data to PDF file
+// @Security		ApiKeyAuth
+// @Tags			api
+// @Description	Get All Records
+// @ID				export-to-pdf
+// @Accept			json
+// @Produce		json
+//
+// @Success		200	{object}	SuccessResponse
+//
+// @Failure		401	{object}	ErrorResponse
+// @Failure		404	{object}	ErrorResponse
+// @Failure		500	{object}	ErrorResponse
+// @Router			/api/export_to_pdf [get]
 func (h *Handler) exportToPDF(c *gin.Context) {
 	sales, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
@@ -115,9 +210,9 @@ func (h *Handler) exportToPDF(c *gin.Context) {
 		return
 	}
 	var data []service.ProductWithIndex
-	for i, product := range sales {
+	for _, product := range sales {
 		data = append(data, service.ProductWithIndex{
-			Index:   i + 1,
+			Index:   product.Id,
 			Product: product,
 		})
 	}

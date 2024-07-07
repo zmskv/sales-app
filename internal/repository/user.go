@@ -15,7 +15,7 @@ func NewUserPostgres(db *gorm.DB) *UserPostgres {
 
 func (r *UserPostgres) CreateUser(user model.User) (string, error) {
 
-	result := r.db.Create(&user)
+	result := r.db.Table("users").Create(&user)
 	if result.Error != nil {
 		return "", result.Error
 	}

@@ -8,13 +8,13 @@ import (
 	"github.com/zmskv/sales-app/internal/repository"
 )
 
-type SalesService struct {
-	repos repository.SalesList
-}
-
 type ProductWithIndex struct {
 	Index   int           `json:"index"`
 	Product model.Product `json:"product"`
+}
+
+type SalesService struct {
+	repos repository.SalesList
 }
 
 func NewSalesService(repos repository.SalesList) *SalesService {
@@ -41,12 +41,10 @@ func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, erro
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
-	// Устанавливаем шрифт и размер для заголовка
 	pdf.SetFont("Arial", "B", 20)
 	pdf.Cell(40, 10, "Sales Report")
 	pdf.Ln(20)
 
-	// Устанавливаем шрифт и размер для заголовков таблицы
 	pdf.SetFont("Arial", "B", 12)
 	headers := []string{"ID", "Title", "Amount", "Price", "Revenue", "Username", "Date"}
 	for _, header := range headers {
@@ -54,7 +52,6 @@ func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, erro
 	}
 	pdf.Ln(10)
 
-	// Устанавливаем шрифт и размер для содержимого таблицы
 	pdf.SetFont("Arial", "", 10)
 
 	for _, record := range sales {
@@ -69,7 +66,6 @@ func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, erro
 	}
 	pdf.Ln(20)
 
-	// Устанавливаем шрифт и размер для заголовков таблицы
 	pdf.SetFont("Arial", "B", 12)
 	headers = []string{"Month", "Total Revenue"}
 	for _, header := range headers {

@@ -29,7 +29,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	api := router.Group("/api", h.userIdentity)
 	{
 		api.GET("/all_sales", h.getAllRecords)
-		api.POST("/export_to_pdf", h.exportToPDF)
+		api.GET("/export_to_pdf", h.exportToPDF)
 		list := api.Group("/list")
 		{
 			list.POST("/add", h.createRecord)

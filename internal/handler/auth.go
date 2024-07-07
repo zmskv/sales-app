@@ -16,13 +16,12 @@ type signUpInput struct {
 // signUp godoc
 //
 //	@Summary		Sign Up
-//	@Security		ApiKeyAuth
 //	@Tags			auth
 //	@Description	Сreates a new user in the system.
 //	@ID				sign-up
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		signUpInput	true	"Account info"
+//	@Param			query	body		signUpInput	true	"Account info"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Router			/auth/sign-up [post]
@@ -40,7 +39,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	msg, err := h.services.User.CreateUser(user)
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusBadRequest, "Username already used")
+		NewErrorResponse(c, http.StatusBadRequest, "Username or Email already used")
 		return
 	}
 
@@ -56,13 +55,12 @@ type signInInput struct {
 // signIn godoc
 //
 //	@Summary		Sign In
-//	@Security		ApiKeyAuth
 //	@Tags			auth
 //	@Description	Sign In
 //	@ID				sign-in
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		signInInput	true	"account info"
+//	@Param			query	body		signInInput	true	"Account info"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
@@ -77,7 +75,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, err := h.services.User.GenerateToken(input.Username, input.Password)
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, "Incorrect login or password")
 		return
 	}
 
