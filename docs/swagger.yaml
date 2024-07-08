@@ -39,6 +39,19 @@ definitions:
     - price
     - title
     type: object
+  handler.recordUpdateInput:
+    properties:
+      amount:
+        type: integer
+      price:
+        type: number
+      title:
+        type: string
+    required:
+    - amount
+    - price
+    - title
+    type: object
   handler.signInInput:
     properties:
       password:
@@ -366,6 +379,55 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get Record
+      tags:
+      - Sales
+    patch:
+      consumes:
+      - application/json
+      description: Update Record
+      operationId: update-record
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Record data to update
+        in: body
+        name: record
+        required: true
+        schema:
+          $ref: '#/definitions/handler.recordUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Record
       tags:
       - Sales
   /api/list/add:

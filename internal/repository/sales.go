@@ -51,3 +51,11 @@ func (r *SalesPostgres) GetAllRecords() ([]model.Product, error) {
 
 	return products, nil
 }
+
+func (r *SalesPostgres) UpdateRecord(record model.Product) (string, error) {
+	result := r.db.Table("sales_list").Where("id = ?", record.Id).Updates(record)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return "Succesful Updated", nil
+}

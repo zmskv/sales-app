@@ -21,6 +21,7 @@ type SalesList interface {
 	DeleteRecord(id string) (string, error)
 	GetAllRecords() ([]model.Product, error)
 	ExportToPDF(productsWithIndex []ProductWithIndex) (*gofpdf.Fpdf, error)
+	UpdateRecord(record model.Product) (string, error)
 }
 
 type Service struct {

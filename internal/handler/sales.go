@@ -17,6 +17,12 @@ type recordInput struct {
 	Price  float64 `json:"price" binding:"required"`
 }
 
+type recordUpdateInput struct {
+	Title  string  `json:"title" binding:"required"`
+	Amount int     `json:"amount" binding:"required"`
+	Price  float64 `json:"price" binding:"required"`
+}
+
 // createRecord godoc
 //
 //	@Summary		Create Record
@@ -151,20 +157,20 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 
 // getAllRecords godoc
 //
-// @Summary		Get All Records
-// @Security		ApiKeyAuth
-// @Tags			Sales
-// @Description	Get All Records
-// @ID				get-all-records
-// @Accept			json
-// @Produce		json
+//	@Summary		Get All Records
+//	@Security		ApiKeyAuth
+//	@Tags			Sales
+//	@Description	Get All Records
+//	@ID				get-all-records
+//	@Accept			json
+//	@Produce		json
 //
-// @Success		200	{object}	service.ProductWithIndex
+//	@Success		200	{object}	service.ProductWithIndex
 //
-// @Failure		401	{object}	ErrorResponse
-// @Failure		404	{object}	ErrorResponse
-// @Failure		500	{object}	ErrorResponse
-// @Router			/api/all_sales [get]
+//	@Failure		401	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/api/all_sales [get]
 func (h *Handler) getAllRecords(c *gin.Context) {
 	data, err := h.services.SalesList.GetAllRecords()
 	if err != nil {
@@ -187,22 +193,81 @@ func (h *Handler) getAllRecords(c *gin.Context) {
 
 }
 
+// updateRecord godoc
+//
+//	@Summary		Update Record
+//	@Security		ApiKeyAuth
+//	@Tags			Sales
+//	@Description	Update Record
+//	@ID				update-record
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string				true	"id"
+//	@Param			record	body		recordUpdateInput	true	"Record data to update"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		401		{object}	ErrorResponse
+//	@Failure		403		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/api/list/{id} [patch]
+func (h *Handler) updateRecord(c *gin.Context) {
+	id := c.Param("id")
+	username, _ := c.Get("username")
+	old_record, err := h.services.SalesList.GetRecord(id)
+	if err != nil {
+		if err.Error() == "record not found" {
+			NewErrorResponse(c, http.StatusNotFound, err.Error())
+			return
+		}
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if username != old_record.Username {
+		NewErrorResponse(c, http.StatusForbidden, "User does not have permission to update this record")
+		return
+	}
+
+	var input recordUpdateInput
+	if err := c.BindJSON(&input); err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	new_record := model.Product{
+		Id:       old_record.Id,
+		Title:    input.Title,
+		Amount:   input.Amount,
+		Price:    input.Price,
+		Username: username.(string),
+		Date:     time.Now(),
+	}
+	msg, err := h.services.SalesList.UpdateRecord(new_record)
+	if err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	NewSuccessResponse(c, http.StatusOK, msg)
+}
+
 // exportToPDF godoc
 //
-// @Summary		Export data to PDF file
-// @Security		ApiKeyAuth
-// @Tags			Sales
-// @Description	Get All Records
-// @ID				export-to-pdf
-// @Accept			json
-// @Produce		json
+//	@Summary		Export data to PDF file
+//	@Security		ApiKeyAuth
+//	@Tags			Sales
+//	@Description	Get All Records
+//	@ID				export-to-pdf
+//	@Accept			json
+//	@Produce		json
 //
-// @Success		200	{object}	SuccessResponse
+//	@Success		200	{object}	SuccessResponse
 //
-// @Failure		401	{object}	ErrorResponse
-// @Failure		404	{object}	ErrorResponse
-// @Failure		500	{object}	ErrorResponse
-// @Router			/api/export_to_pdf [get]
+//	@Failure		401	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/api/export_to_pdf [get]
 func (h *Handler) exportToPDF(c *gin.Context) {
 	sales, err := h.services.SalesList.GetAllRecords()
 	if err != nil {

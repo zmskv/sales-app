@@ -37,6 +37,10 @@ func (s *SalesService) GetAllRecords() ([]model.Product, error) {
 	return s.repos.GetAllRecords()
 }
 
+func (s *SalesService) UpdateRecord(record model.Product) (string, error) {
+	return s.repos.UpdateRecord(record)
+}
+
 func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()

@@ -38,6 +38,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		list := api.Group("/list")
 		{
 			list.POST("/add", h.createRecord)
+			list.PATCH("/:id", h.updateRecord)
 			list.GET("/:id", h.getRecord)
 			list.DELETE("/delete", h.deleteRecord)
 
