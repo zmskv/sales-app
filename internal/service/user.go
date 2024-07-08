@@ -80,3 +80,16 @@ func generatePasswordHash(password string) string {
 
 	return fmt.Sprintf("%x", hashed_password.Sum(nil))
 }
+
+func (s *UserService) GetUserInfo(id string) (model.User, error) {
+	return s.repos.GetUserInfo(id)
+}
+
+func (s *UserService) UpdateUserInfo(user model.User) (string, error) {
+	user.Password = generatePasswordHash(user.Password)
+	return s.repos.UpdateUserInfo(user)
+}
+
+func (s *UserService) DeleteUser(id string) (string, error) {
+	return s.repos.DeleteUser(id)
+}

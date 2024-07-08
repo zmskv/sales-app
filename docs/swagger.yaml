@@ -10,6 +10,19 @@ definitions:
       message:
         type: string
     type: object
+  handler.inputUpdateUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   handler.recordInput:
     properties:
       amount:
@@ -83,6 +96,179 @@ info:
   title: Sales API
   version: "1.0"
 paths:
+  /account/delete_user:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Current User
+      operationId: delete-current-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Current User
+      tags:
+      - Account
+  /account/info:
+    get:
+      consumes:
+      - application/json
+      description: Get User Info
+      operationId: get-user-info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Info
+      tags:
+      - Account
+  /account/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout
+      operationId: Logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout
+      tags:
+      - Account
+  /account/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign In
+      operationId: sign-in
+      parameters:
+      - description: Account info
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Sign In
+      tags:
+      - Account
+  /account/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Сreates a new user in the system.
+      operationId: sign-up
+      parameters:
+      - description: Account info
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Sign Up
+      tags:
+      - Account
+  /account/update_info:
+    patch:
+      consumes:
+      - application/json
+      description: Update User Info
+      operationId: update-info
+      parameters:
+      - description: Account info
+        in: body
+        name: query
+        required: true
+        schema:
+          $ref: '#/definitions/handler.inputUpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User Info
+      tags:
+      - Account
   /api/all_sales:
     get:
       consumes:
@@ -112,7 +298,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get All Records
       tags:
-      - api
+      - Sales
   /api/export_to_pdf:
     get:
       consumes:
@@ -142,7 +328,7 @@ paths:
       - ApiKeyAuth: []
       summary: Export data to PDF file
       tags:
-      - api
+      - Sales
   /api/list/{id}:
     get:
       consumes:
@@ -181,7 +367,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get Record
       tags:
-      - api
+      - Sales
   /api/list/add:
     post:
       consumes:
@@ -218,7 +404,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create Record
       tags:
-      - api
+      - Sales
   /api/list/delete:
     delete:
       consumes:
@@ -261,65 +447,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete Record
       tags:
-      - api
-  /auth/sign-in:
-    post:
-      consumes:
-      - application/json
-      description: Sign In
-      operationId: sign-in
-      parameters:
-      - description: Account info
-        in: body
-        name: query
-        required: true
-        schema:
-          $ref: '#/definitions/handler.signInInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Sign In
-      tags:
-      - auth
-  /auth/sign-up:
-    post:
-      consumes:
-      - application/json
-      description: Сreates a new user in the system.
-      operationId: sign-up
-      parameters:
-      - description: Account info
-        in: body
-        name: query
-        required: true
-        schema:
-          $ref: '#/definitions/handler.signUpInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Sign Up
-      tags:
-      - auth
+      - Sales
 securityDefinitions:
   ApiKeyAuth:
     in: Header

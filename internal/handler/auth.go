@@ -16,7 +16,7 @@ type signUpInput struct {
 // signUp godoc
 //
 //	@Summary		Sign Up
-//	@Tags			auth
+//	@Tags			Account
 //	@Description	Сreates a new user in the system.
 //	@ID				sign-up
 //	@Accept			json
@@ -24,7 +24,7 @@ type signUpInput struct {
 //	@Param			query	body		signUpInput	true	"Account info"
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
-//	@Router			/auth/sign-up [post]
+//	@Router			/account/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
 	var input signUpInput
 
@@ -55,7 +55,7 @@ type signInInput struct {
 // signIn godoc
 //
 //	@Summary		Sign In
-//	@Tags			auth
+//	@Tags			Account
 //	@Description	Sign In
 //	@ID				sign-in
 //	@Accept			json
@@ -64,7 +64,7 @@ type signInInput struct {
 //	@Success		200		{object}	SuccessResponse
 //	@Failure		400		{object}	ErrorResponse
 //	@Failure		500		{object}	ErrorResponse
-//	@Router			/auth/sign-in [post]
+//	@Router			/account/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 
@@ -78,6 +78,33 @@ func (h *Handler) signIn(c *gin.Context) {
 		NewErrorResponse(c, http.StatusBadRequest, "Incorrect login or password")
 		return
 	}
-
+	c.SetCookie("token", token, 3600*12, "/", "", false, true)
+	c.Header("Authorization", "Bearer "+token)
 	NewSuccessResponse(c, http.StatusOK, token)
+}
+
+// Logout godoc
+//
+//	@Summary		Logout
+//	@Security		ApiKeyAuth
+//	@Tags			Account
+//	@Description	Logout
+//	@ID				Logout
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	SuccessResponse
+//	@Failure		401	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/account/logout [post]
+func (h *Handler) Logout(c *gin.Context) {
+	cookie, err := c.Cookie("token")
+	if err != nil || cookie == "" {
+		NewErrorResponse(c, http.StatusUnauthorized, "No token found in cookies")
+		return
+	}
+
+	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.Header("Authorization", "")
+
+	NewSuccessResponse(c, http.StatusOK, "Successfully logged out")
 }

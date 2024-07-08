@@ -21,7 +21,7 @@ type recordInput struct {
 //
 //	@Summary		Create Record
 //	@Security		ApiKeyAuth
-//	@Tags			api
+//	@Tags			Sales
 //	@Description	Create Record
 //	@ID				create-record
 //	@Accept			json
@@ -63,7 +63,7 @@ func (h *Handler) createRecord(c *gin.Context) {
 //
 //	@Summary		Get Record
 //	@Security		ApiKeyAuth
-//	@Tags			api
+//	@Tags			Sales
 //	@Description	Get Record
 //	@ID				get-record
 //	@Accept			json
@@ -105,7 +105,7 @@ func (h *Handler) getRecord(c *gin.Context) {
 //
 //	@Summary		Delete Record
 //	@Security		ApiKeyAuth
-//	@Tags			api
+//	@Tags			Sales
 //	@Description	Delete Record
 //	@ID				delete-record
 //	@Accept			json
@@ -153,7 +153,7 @@ func (h *Handler) deleteRecord(c *gin.Context) {
 //
 // @Summary		Get All Records
 // @Security		ApiKeyAuth
-// @Tags			api
+// @Tags			Sales
 // @Description	Get All Records
 // @ID				get-all-records
 // @Accept			json
@@ -191,7 +191,7 @@ func (h *Handler) getAllRecords(c *gin.Context) {
 //
 // @Summary		Export data to PDF file
 // @Security		ApiKeyAuth
-// @Tags			api
+// @Tags			Sales
 // @Description	Get All Records
 // @ID				export-to-pdf
 // @Accept			json

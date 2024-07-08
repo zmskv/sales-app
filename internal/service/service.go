@@ -10,6 +10,9 @@ type User interface {
 	CreateUser(user model.User) (string, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (string, string, string, error)
+	GetUserInfo(id string) (model.User, error)
+	UpdateUserInfo(user model.User) (string, error)
+	DeleteUser(id string) (string, error)
 }
 
 type SalesList interface {

@@ -2,21 +2,18 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
-	header := c.GetHeader("Authorization")
-	if header == "" {
-		NewErrorResponse(c, http.StatusUnauthorized, "Auth Header is empty")
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		NewErrorResponse(c, http.StatusUnauthorized, "Token not found in cookies")
 		return
 	}
 
-	headerParts := strings.Split(header, " ")
-
-	UserId, Username, Email, err := h.services.User.ParseToken(headerParts[1])
+	UserId, Username, Email, err := h.services.User.ParseToken(cookie)
 	if err != nil {
 		NewErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
@@ -25,5 +22,4 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	c.Set("user_id", UserId)
 	c.Set("username", Username)
 	c.Set("email", Email)
-
 }

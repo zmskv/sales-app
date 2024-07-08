@@ -8,6 +8,9 @@ import (
 type User interface {
 	CreateUser(user model.User) (string, error)
 	GetUser(username, password string) (model.User, error)
+	GetUserInfo(id string) (model.User, error)
+	UpdateUserInfo(user model.User) (string, error)
+	DeleteUser(id string) (string, error)
 }
 
 type SalesList interface {
