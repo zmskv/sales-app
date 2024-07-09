@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/jung-kurt/gofpdf"
 	"github.com/zmskv/sales-app/internal/model"
@@ -68,7 +69,31 @@ func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, erro
 		pdf.CellFormat(25, 10, record.Product.Date.Format("2006-01-02"), "1", 0, "C", false, 0, "")
 		pdf.Ln(10)
 	}
-	pdf.Ln(20)
+	pdf.Ln(15)
+
+	pdf.SetFont("Arial", "B", 12)
+	headers = []string{"Date", "Total Revenue"}
+	for _, header := range headers {
+		pdf.CellFormat(87.5, 10, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(10)
+
+	pdf.SetFont("Arial", "", 10)
+	revenueByDay := make(map[string]float64)
+	for _, record := range sales {
+		day := record.Product.Date.Format("2006-01-02")
+		if _, exists := revenueByDay[day]; !exists {
+			revenueByDay[day] = 0.0
+		}
+		revenueByDay[day] += float64(record.Product.Amount) * record.Product.Price
+	}
+
+	for day, revenue := range revenueByDay {
+		pdf.CellFormat(87.5, 10, day, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(87.5, 10, fmt.Sprintf("%.2f", revenue), "1", 0, "C", false, 0, "")
+		pdf.Ln(10)
+	}
+	pdf.Ln(15)
 
 	pdf.SetFont("Arial", "B", 12)
 	headers = []string{"Month", "Total Revenue"}
@@ -95,11 +120,56 @@ func (s *SalesService) ExportToPDF(sales []ProductWithIndex) (*gofpdf.Fpdf, erro
 		pdf.CellFormat(87.5, 10, fmt.Sprintf("%.2f", revenue), "1", 0, "C", false, 0, "")
 		pdf.Ln(10)
 	}
-	pdf.Ln(20)
+	pdf.Ln(15)
+
+	pdf.SetFont("Arial", "B", 14)
+	pdf.Cell(20, 10, "Top Sellers")
+	pdf.Ln(10)
+
+	pdf.SetFont("Arial", "B", 12)
+	headers = []string{"Username", "Total Revenue"}
+	for _, header := range headers {
+		pdf.CellFormat(87.5, 10, header, "1", 0, "C", false, 0, "")
+	}
+	pdf.Ln(10)
+
+	pdf.SetFont("Arial", "", 10)
+
+	revenueByUsername := make(map[string]float64)
+	for _, record := range sales {
+		username := record.Product.Username
+		if _, exists := revenueByUsername[username]; !exists {
+			revenueByUsername[username] = 0.0
+		}
+		revenueByUsername[username] += float64(record.Product.Amount) * record.Product.Price
+	}
+
+	var revenueSlice []struct {
+		Username string
+		Revenue  float64
+	}
+
+	for k, v := range revenueByUsername {
+		revenueSlice = append(revenueSlice, struct {
+			Username string
+			Revenue  float64
+		}{k, v})
+	}
+
+	sort.Slice(revenueSlice, func(i, j int) bool {
+		return revenueSlice[i].Revenue > revenueSlice[j].Revenue
+	})
+
+	for _, item := range revenueSlice {
+		pdf.CellFormat(87.5, 10, item.Username, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(87.5, 10, fmt.Sprintf("%.2f", item.Revenue), "1", 0, "C", false, 0, "")
+		pdf.Ln(10)
+	}
+	pdf.Ln(15)
 
 	pdf.SetFont("Arial", "B", 14)
 
-	pdf.Cell(40, 20, fmt.Sprintf("Total Revenue for all time: %.2f", totalRevenue))
+	pdf.Cell(40, 15, fmt.Sprintf("Total Revenue for all time: %.2f", totalRevenue))
 
 	return pdf, pdf.Error()
 }
