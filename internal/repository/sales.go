@@ -5,15 +5,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type SalesPostgres struct {
+type SalesRepository struct {
 	db *gorm.DB
 }
 
-func NewSalesPostgres(db *gorm.DB) *SalesPostgres {
-	return &SalesPostgres{db: db}
+func NewSalesRepository(db *gorm.DB) *SalesRepository {
+	return &SalesRepository{db: db}
 }
 
-func (r *SalesPostgres) CreateRecord(record model.Product) (int, error) {
+func (r *SalesRepository) CreateRecord(record model.Product) (int, error) {
 
 	result := r.db.Table("sales_list").Create(&record)
 	if result.Error != nil {
@@ -23,7 +23,7 @@ func (r *SalesPostgres) CreateRecord(record model.Product) (int, error) {
 	return record.Id, nil
 }
 
-func (r *SalesPostgres) GetRecord(id string) (model.Product, error) {
+func (r *SalesRepository) GetRecord(id string) (model.Product, error) {
 	var data model.Product
 	request := r.db.Table("sales_list").Where("id = ?", id).First(&data)
 	if request.Error != nil {
@@ -33,7 +33,7 @@ func (r *SalesPostgres) GetRecord(id string) (model.Product, error) {
 	return data, nil
 }
 
-func (r *SalesPostgres) DeleteRecord(id string) (string, error) {
+func (r *SalesRepository) DeleteRecord(id string) (string, error) {
 	request := r.db.Table("sales_list").Where("id = ?", id).Delete(&model.Product{})
 	if request.Error != nil {
 		return "", request.Error
@@ -42,7 +42,7 @@ func (r *SalesPostgres) DeleteRecord(id string) (string, error) {
 	return "Successful deleted", nil
 }
 
-func (r *SalesPostgres) GetAllRecords() ([]model.Product, error) {
+func (r *SalesRepository) GetAllRecords() ([]model.Product, error) {
 	var products []model.Product
 	request := r.db.Table("sales_list").Find(&products)
 	if request.Error != nil {
@@ -52,7 +52,7 @@ func (r *SalesPostgres) GetAllRecords() ([]model.Product, error) {
 	return products, nil
 }
 
-func (r *SalesPostgres) UpdateRecord(record model.Product) (string, error) {
+func (r *SalesRepository) UpdateRecord(record model.Product) (string, error) {
 	result := r.db.Table("sales_list").Where("id = ?", record.Id).Updates(record)
 	if result.Error != nil {
 		return "", result.Error

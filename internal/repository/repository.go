@@ -28,7 +28,7 @@ type Repository struct {
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		User:      NewUserPostgres(db),
-		SalesList: NewSalesPostgres(db),
+		User:      NewUserRepository(db),
+		SalesList: NewSalesRepository(db),
 	}
 }
