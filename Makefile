@@ -11,7 +11,7 @@ app-start:
 	go run cmd/main.go
 
 build:
-	go build -o bin/sales-app cmd/main.go
+	go build github.com/zmskv/sales-app/cmd
 
 migrate-up:
 	$(MIGRATE) up
