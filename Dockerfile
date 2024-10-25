@@ -1,11 +1,17 @@
-FROM golang:latest
+FROM golang:1.23-alpine AS builder
 
-RUN go version
-ENV GOPATH=/
+WORKDIR /app
 
-COPY ./ ./
+COPY . .
 
-RUN go mod download 
+RUN go mod download
+
 RUN go build -o sales-app ./cmd/main.go
+
+FROM alpine:3.14
+
+WORKDIR /app
+
+COPY --from=builder /app/sales-app .
 
 CMD ["./sales-app"]
